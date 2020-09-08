@@ -2,13 +2,14 @@ import pytest
 import re
 
 
-
 def search_by_simple_string_matching(search_term, file_path):
     count = 0
+    search_term = re.sub(r'\W+', '',search_term.lower())
     with open(file_path) as file:
         for line in file:
-            for word in line.split():
-                if word.lower() == search_term.lower():
+            for word in line.strip().split():
+                temp = re.sub(r'\W+', '',word.lower())
+                if temp == search_term:
                     count += 1
 
     return count
@@ -27,4 +28,21 @@ def search_by_regular_expression_matching(search_term, file_path):
 
 
 def search_by_index(search_term, file_path):
-    pass    
+    words_dict = dict()
+    search_term = re.sub(r'\W+', '',search_term.lower())
+    with open(file_path) as file:
+        for line in file:
+            for word in line.strip().split():
+                temp = re.sub(r'\W+', '', word.lower())
+                print(f'{temp}')
+                if temp in words_dict:
+                    words_dict[temp] += 1    
+                else:
+                    words_dict[temp] = 1
+
+    print(f"{words_dict}")    
+    
+    if search_term in words_dict:
+        return words_dict[search_term]
+    else: 
+        return 0
