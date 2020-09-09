@@ -48,10 +48,7 @@ def build_dict(file_path):
 def search_by_index(search_term, words_dict):
     # search_term = re.sub(r'\W+', '',search_term.lower())
     search_term = search_term.lower()    
-    if search_term in words_dict:
-        return words_dict[search_term]
-    
-    return 0
+    return words_dict[search_term]
 
 
 def find_using_string_match(search_term, base_dir, file1, file2, file3):
