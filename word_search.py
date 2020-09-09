@@ -1,5 +1,6 @@
 import pytest
 import re
+import timeit
 
 
 def search_by_simple_string_matching(search_term, file_path):
@@ -49,7 +50,8 @@ def search_by_index(search_term, file_path):
 
 
 def main():
-    pass
+    search_tearm = input("Enter the search term: ")
+    
 
 
 if __name__ == '__main__':
