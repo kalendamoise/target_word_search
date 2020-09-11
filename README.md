@@ -57,10 +57,37 @@ Elapsed time: 1.5019000000116023e-05 ms
 
 ```
 
+### Processing feedback 
 A quick observation will point to the fact that Index Search is slower in this implementation. 
 This result is counter-intuitive because memory access-access is supposed to be faster than parsing through a file. 
-With smaller files, it should have been the fastest.  
+With smaller files, it should have been the fastest because file processing is I/O-bound while index access is CPU and RAM bound.
+  
+Because Python uses a single process by default, we could speed Search by Index by simple implementing multiprocessing. 
+We can chunk up input data base on the number of agent and lunch multiple processes. 
+
+We can leverage libraries, python has many libraries that probably address the issue of latency in file processing. 
+
+we might need to switch from using the standard interpreter. PyPY is a good alternative.  
 
     
 Run a performance test that does 2M searches with random search terms, and measures execution time. Which approach is fastest? Why?
 Provide some thoughts on what you would do on the software or hardware side to make this program scale to handle massive content and/or very large request volume (5000 requests/second or more). 
+
+### How to run the application
+to execute the project just, download it and navigate to `target_word_search/Document_Search` directory. 
+Make sure you have python3 install. If you do, run `$python3 word_search.py` this should execute the program. 
+If you want to run the unit test, navigate to `target_word_search/Document_Search/tests`, after that execute: 
+ `$pytest word_search_tests.py`. Here is sample test run. 
+ 
+```text
+ pytest word_search_tests.py 
+======================================================================================================================== test session starts =========================================================================================================================
+platform darwin -- Python 3.8.3, pytest-6.0.1, py-1.9.0, pluggy-0.13.1
+rootdir: /Users/*****/Workspace/target_word_search
+collected 14 items                                                                                                                                                                                                                                                   
+
+word_search_tests.py ..............                                                                                                                                                                                                                            [100%]
+
+========================================================================================================================= 14 passed in 0.03s =========================================================================================================================
+``` 
+
