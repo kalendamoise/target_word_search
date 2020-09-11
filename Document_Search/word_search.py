@@ -14,11 +14,11 @@ def search_by_simple_string_matching(search_term, file_path):
     :return: the number of time the search term was found
     """
     count = 0
-    search_term = search_term.lower()
+    search_term = re.sub(r'\W+', '', search_term.lower())
     with open(file_path) as file:
         for line in file:
             for word in line.strip().split():
-                temp = word.lower()
+                temp = re.sub(r'\W+', '', word.lower())
                 if temp == search_term:
                     count += 1
 
@@ -33,17 +33,13 @@ def search_by_regular_expression_matching(search_term, file_path):
     :param file_path: the path of the file in which to search
     :return: the number of time the search term was found
     """
-
     count = 0
-    search_term = search_term.lower()
-    pattern = re.compile(search_term)
+    search_val = f"(?=({search_term.lower()}))"
     with open(file_path) as file:
         for line in file:
-            
-            for word in line.lower().split():
-                if pattern.match(word):
-                    count += 1
-
+            # re.finditer(,) return an iterable with stating index of each match.
+            # the length of the returned array represent the number of matched word
+            count += len([x for x in re.finditer(search_val, line.lower())])
     return count
 
 
@@ -58,7 +54,8 @@ def build_dict(file_path):
     with open(file_path) as file:
         for line in file:
             for word in line.split():
-                temp = word.lower()
+                # remove all non alphanumeric and white spaces
+                temp = re.sub(r'\W+', '', word.lower())
                 if temp in words_dict:
                     words_dict[temp] += 1    
                 else:
@@ -74,7 +71,7 @@ def search_by_index(search_term, words_dict):
     :param words_dict: the dictionary containing string keys to search for
     :return: the number of time the search term was found
     """
-    search_term = search_term.lower()
+    search_term = re.sub(r'\W+', '', search_term.lower())
     if search_term in words_dict:  
         return words_dict[search_term]
     return 0
@@ -89,7 +86,7 @@ def print_results(search_results, elapse_time):
     """
     my_queue = queue.PriorityQueue(len(search_results))
     for result in search_results:
-        my_queue.put(result)
+        my_queue.put((result[0] * -1, result[1]))
 
     print(f'\nSearch results: ')
     while not my_queue.empty():
@@ -108,6 +105,7 @@ def search(search_type, search_term, base_dir, *args):
     :param search_term: term to search for
     :param base_dir: the base directory from which this program is executing
     :param args: text file(s)
+    :return a tuple containing the search result and elapse time.
     """
     dictionaries = []
     if search_type == '3':
@@ -123,15 +121,13 @@ def search(search_type, search_term, base_dir, *args):
             result = search_by_regular_expression_matching(search_term, os.path.join(base_dir, _file))
         else:
             result = search_by_index(search_term, dictionaries[index])
-        # result is negated here because it is being used as trick inside print.
-        # this can be isolated inside print, but tuples are immutable.
-        search_results.append((result * -1, _file))
+
+        search_results.append((result, _file))
 
     stop_time = timeit.default_timer()
     elapse_time = stop_time - start_time
-    print_results(
-        search_results,
-        elapse_time)
+
+    return search_results, elapse_time
 
 
 def main():
@@ -145,9 +141,11 @@ def main():
     search_method = input("Search Method: 1)String Match 2)Regular Expression 3)Indexed ").strip()
     while search_method not in ('1', '2', '3'):
         print("Enter one of the following values for the options bellow: 1, 2, 3")
-        search_method = input("Search Method: 1)String Match 2)Regular Expression 3)Indexed").strip()    
+        search_method = input("Search Method: 1)String Match 2)Regular Expression 3)Indexed").strip()
 
-    search(search_method, search_term, base_dir, file1, file2, file3)
+    search_results, elapse_time = search(search_method, search_term, base_dir, file1, file2, file3)
+
+    print_results(search_results, elapse_time)
 
 
 if __name__ == '__main__':
