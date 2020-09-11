@@ -75,19 +75,34 @@ Provide some thoughts on what you would do on the software or hardware side to m
 
 ### How to run the application
 to execute the project just, download it and navigate to `target_word_search/Document_Search` directory. 
-Make sure you have python3 install. If you do, run `$python3 word_search.py` this should execute the program. 
+Make sure you have python3 install. If you do, run `$ python3 word_search.py` this should execute the program. 
 If you want to run the unit test, navigate to `target_word_search/Document_Search/tests`, after that execute: 
- `$pytest word_search_tests.py`. Here is sample test run. 
+ `$ pytest word_search_tests.py`. Here is sample test run. 
  
 ```text
- pytest word_search_tests.py 
+$ pytest -v word_search_tests.py  
 ======================================================================================================================== test session starts =========================================================================================================================
-platform darwin -- Python 3.8.3, pytest-6.0.1, py-1.9.0, pluggy-0.13.1
-rootdir: /Users/*****/Workspace/target_word_search
+platform darwin -- Python 3.8.3, pytest-6.0.1, py-1.9.0, pluggy-0.13.1 -- /Users/moise/.pyenv/versions/3.8.3/bin/python3.8
+cachedir: .pytest_cache
+rootdir: /Users/moise/Workspa"ce/target_word_search
 collected 14 items                                                                                                                                                                                                                                                   
 
-word_search_tests.py ..............                                                                                                                                                                                                                            [100%]
+word_search_tests.py::test_search_by_simple_string_matching PASSED                                                                                                                                                                                             [  7%]
+word_search_tests.py::test_search_by_simple_string_matching_no_match PASSED                                                                                                                                                                                    [ 14%]
+word_search_tests.py::test_search_by_simple_string_matching_hitchhikers PASSED                                                                                                                                                                                 [ 21%]
+word_search_tests.py::test_search_by_simple_string_matching_file_not_found_error PASSED                                                                                                                                                                        [ 28%]
+word_search_tests.py::test_search_by_re_matching PASSED                                                                                                                                                                                                        [ 35%]
+word_search_tests.py::test_search_by_re_matching_no_match PASSED                                                                                                                                                                                               [ 42%]
+word_search_tests.py::test_search_by_re_matching_hitchhikers PASSED                                                                                                                                                                                            [ 50%]
+word_search_tests.py::test_search_by_re_matching_file_not_found_error PASSED                                                                                                                                                                                   [ 57%]
+word_search_tests.py::test_search_by_index_matching PASSED                                                                                                                                                                                                     [ 64%]
+word_search_tests.py::test_search_by_index_no_match PASSED                                                                                                                                                                                                     [ 71%]
+word_search_tests.py::test_search_by_index_hitchhikers PASSED                                                                                                                                                                                                  [ 78%]
+word_search_tests.py::test_search_string_match PASSED                                                                                                                                                                                                          [ 85%]
+word_search_tests.py::test_search_regex_match PASSED                                                                                                                                                                                                           [ 92%]
+word_search_tests.py::test_search_index_match PASSED                                                                                                                                                                                                           [100%]
 
 ========================================================================================================================= 14 passed in 0.03s =========================================================================================================================
+(
 ``` 
 
