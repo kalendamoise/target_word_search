@@ -1,4 +1,3 @@
-import pytest
 import re
 import timeit
 import os
@@ -7,6 +6,13 @@ import queue
 
 
 def search_by_simple_string_matching(search_term, file_path):
+    """
+    simple string matching search
+
+    :param search_term: the word to search for
+    :param file_path: the path of the file in which to search
+    :return: the number of time the search term was found
+    """
     count = 0
     search_term = search_term.lower()
     with open(file_path) as file:
@@ -20,11 +26,20 @@ def search_by_simple_string_matching(search_term, file_path):
 
 
 def search_by_regular_expression_matching(search_term, file_path):
+    """
+    Regular Expression search
+
+    :param search_term: the word to search for
+    :param file_path: the path of the file in which to search
+    :return: the number of time the search term was found
+    """
+
     count = 0
     search_term = search_term.lower()
     pattern = re.compile(search_term)
     with open(file_path) as file:
         for line in file:
+            
             for word in line.lower().split():
                 if pattern.match(word):
                     count += 1
@@ -33,6 +48,12 @@ def search_by_regular_expression_matching(search_term, file_path):
 
 
 def build_dict(file_path):
+    """
+    build a dictionary from the provided file_path
+
+    :param file_path: the path of the file from which to create a dictionary
+    :return: a diction of string key and the number of time that string is present in the file value
+    """
     words_dict = dict()
     with open(file_path) as file:
         for line in file:
@@ -41,95 +62,93 @@ def build_dict(file_path):
                 if temp in words_dict:
                     words_dict[temp] += 1    
                 else:
-                    words_dict[temp] = 1  
-
+                    words_dict[temp] = 1
     return OrderedDict(words_dict)
 
+
 def search_by_index(search_term, words_dict):
+    """
+    Search by index matching search
+
+    :param search_term: the word to search for
+    :param words_dict: the dictionary containing string keys to search for
+    :return: the number of time the search term was found
+    """
     search_term = search_term.lower()
     if search_term in words_dict:  
         return words_dict[search_term]
     return 0
 
 
-def print_results(caller_details, french_armed_forces, hitchhikers, warp_drive, elapse_time):
-    
-    my_queue = queue.PriorityQueue(3)
-    my_queue.put(french_armed_forces)
-    my_queue.put(hitchhikers)
-    my_queue.put(warp_drive)
+def print_results(search_results, elapse_time):
+    """
+    Print the results of a given term search
 
-    print(f'{caller_details} Search results: ')
-    
+    :param search_results: the list of results for each file
+    :param elapse_time: the time it took execute the search
+    """
+    my_queue = queue.PriorityQueue(len(search_results))
+    for result in search_results:
+        my_queue.put(result)
+
+    print(f'\nSearch results: ')
     while not my_queue.empty():
         val = my_queue.get()
         print(f'\t{val[1]} - {val[0] * -1 } matches')
-            
-            
-    print(f'Elapsed time: {elapse_time}')
+
+    print(f'Elapsed time: {elapse_time} ms')
     print("")
 
-def find_using_string_match(search_term, base_dir, file1, file2, file3):
-    start_time = timeit.default_timer()
 
-    french_armed_forces =  search_by_simple_string_matching(search_term, os.path.join(base_dir, file1))
-    hitchhikers =  search_by_simple_string_matching(search_term, os.path.join(base_dir, file2))
-    warp_drive =  search_by_simple_string_matching(search_term, os.path.join(base_dir, file3))
-    #dante =  search_by_simple_string_matching(search_term, os.path.join(base_dir, file4))
+def search(search_type, search_term, base_dir, *args):
+    """
+    execute search for in all files
+
+    :param search_type: the type fo search execute
+    :param search_term: term to search for
+    :param base_dir: the base directory from which this program is executing
+    :param args: text file(s)
+    """
+    dictionaries = []
+    if search_type == '3':
+        for _file in args:
+            dictionaries.append(build_dict(os.path.join(base_dir, _file)))
+
+    start_time = timeit.default_timer()
+    search_results = []
+    for index, _file in enumerate(args):
+        if search_type == "1":
+            result = search_by_simple_string_matching(search_term, os.path.join(base_dir, _file))
+        elif search_type == "2":
+            result = search_by_regular_expression_matching(search_term, os.path.join(base_dir, _file))
+        else:
+            result = search_by_index(search_term, dictionaries[index])
+        # result is negated here because it is being used as trick inside print.
+        # this can be isolated inside print, but tuples are immutable.
+        search_results.append((result * -1, _file))
 
     stop_time = timeit.default_timer()
     elapse_time = stop_time - start_time
-    
-    print_results("String Matching", (french_armed_forces * -1, file1) , (hitchhikers * -1, file2), (warp_drive * -1, file3), elapse_time)
-
-
-def find_by_regex(search_term, base_dir, file1, file2, file3):
-    start_time = timeit.default_timer()
-
-    french_armed_forces =  search_by_regular_expression_matching(search_term, os.path.join(base_dir, file1))
-    hitchhikers =  search_by_regular_expression_matching(search_term, os.path.join(base_dir, file2))
-    warp_drive =  search_by_regular_expression_matching(search_term, os.path.join(base_dir, file3))
-    #dante =  search_by_regular_expression_matching(search_term, os.path.join(base_dir, file4))
-
-    stop_time = timeit.default_timer()
-    elapse_time = stop_time - start_time
-    
-    print_results("Regex Matching", (french_armed_forces * -1, file1) , (hitchhikers * -1, file2), (warp_drive * -1, file3), elapse_time)
-
-
-def find_by_index(search_term, base_dir, file1, file2, file3):
-    file1_dict =  build_dict(os.path.join(base_dir, file1))
-    file2_dict =  build_dict(os.path.join(base_dir, file2))
-    file3_dict =  build_dict(os.path.join(base_dir, file3))
-    #file4_dict =  build_dict(os.path.join(base_dir, file4))
-    
-    start_time = timeit.default_timer()
-
-    french_armed_forces =  search_by_index(search_term, file1_dict)
-    hitchhikers =  search_by_index(search_term, file2_dict)
-    warp_drive =  search_by_index(search_term, file3_dict)
-    #dante =  search_by_index(search_term, file4_dict)
-
-    stop_time = timeit.default_timer()
-    elapse_time = stop_time - start_time
-    
-    print_results("Index Matching", (french_armed_forces * -1, file1) , (hitchhikers * -1 , file2), (warp_drive * -1, file3), elapse_time)
+    print_results(
+        search_results,
+        elapse_time)
 
 
 def main():
-    search_term = input("Enter the search term: ")
     base_dir = os.path.join(os.getcwd(), 'sample_files')
     file1 = 'french_armed_forces.txt'
     file2 = 'hitchhikers.txt'
     file3 = 'warp_drive.txt'
-    #file4 = 'dante.txt'
-    print("")
-
-    find_by_index(search_term, base_dir, file1, file2, file3)
-    find_using_string_match(search_term, base_dir, file1, file2, file3)
-    find_by_regex(search_term, base_dir, file1, file2, file3)
-
     
+    print("")
+    search_term = input("Enter the search term: ").strip()
+    search_method = input("Search Method: 1)String Match 2)Regular Expression 3)Indexed ").strip()
+    while search_method not in ('1', '2', '3'):
+        print("Enter one of the following values for the options bellow: 1, 2, 3")
+        search_method = input("Search Method: 1)String Match 2)Regular Expression 3)Indexed").strip()    
+
+    search(search_method, search_term, base_dir, file1, file2, file3)
+
 
 if __name__ == '__main__':
     main()
